@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wtime/services/databaseHelper.dart';
+import 'package:wtime/services/contraction.dart';
+import 'package:wtime/utilities/card.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -7,15 +8,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Widget> tableContract = [
-    Text('Aucune contraction'),
-  ];
-  final dbHelper = DatabaseHelper.instance;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _delete();
+  }
+
+  List<Widget> myContraction = [];
+
+  Contraction contraction = new Contraction();
+  Future updateUi() async {
+    myContraction = await contraction.query();
+    setState(() {
+      myContraction;
+    });
   }
 
   @override
@@ -34,22 +40,59 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Container(
+                      height: MediaQuery.of(context).size.height / 2,
                       margin: EdgeInsets.all(35.0),
                       padding: EdgeInsets.all(25.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      child: Column(
-                        children: tableContract,
+                      child: CustomScrollView(
+                        primary: false,
+                        slivers: <Widget>[
+                          SliverPadding(
+                            padding: const EdgeInsets.all(20.0),
+                            sliver: SliverGrid.count(
+                              crossAxisSpacing: 10.0,
+                              crossAxisCount: 2,
+                              children: myContraction,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Container(
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
-                            _insert();
-                            _query();
+                            Contraction.delete();
+                            updateUi();
+                          });
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 60),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[100],
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Fause alerte',
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            Contraction.insert();
+                            updateUi();
                           });
                         },
                         child: Container(
@@ -76,41 +119,5 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
-  }
-
-  void _insert() async {
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.columnName: DateTime.now().millisecondsSinceEpoch,
-    };
-    final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
-  }
-
-  void _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    tableContract.clear();
-    allRows.forEach((row) {
-      var date = new DateTime.fromMicrosecondsSinceEpoch(row['heure'] * 1000);
-      var dateFormater = date.hour.toString() + ':' + date.minute.toString();
-      var id = row['_id'].toString();
-      print('Id : ' + row['_id'].toString() + 'Heure : ' + dateFormater);
-
-      tableContract.add(Text(
-        id + ')  Contraction a   ' + dateFormater,
-        style: TextStyle(
-          fontSize: 18.0,
-          color: Color(0xFF8D8E98),
-        ),
-      ));
-    });
-  }
-
-  void _delete() async {
-    // Assuming that the number of rows is the id for the last row.
-    final id = await dbHelper.queryRowCount();
-    final rowsDeleted = await dbHelper.deleteALL();
-    print('deleted $rowsDeleted row(s): row $id');
   }
 }
