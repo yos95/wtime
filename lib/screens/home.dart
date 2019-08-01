@@ -12,6 +12,7 @@ class _HomeState extends State<Home> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    updateUi();
   }
 
   List<Widget> myContraction = [];
@@ -39,6 +40,17 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
+                    Flexible(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                          child: Text(
+                            'Tableau des contractions',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                    ),
                     Container(
                       height: MediaQuery.of(context).size.height / 2,
                       margin: EdgeInsets.all(35.0),
@@ -62,52 +74,44 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            Contraction.delete();
+                      margin:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 60),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                        color: Colors.blueGrey[100],
+                        onPressed: () {
+                          setState(() async {
+                            await Contraction.delete();
                             updateUi();
                           });
                         },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 60),
-                          padding:
-                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[100],
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Fause alerte',
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ),
+                        child: Text(
+                          'Fausse alerte',
+                          style: TextStyle(fontSize: 20.0),
                         ),
                       ),
                     ),
                     Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            Contraction.insert();
+                      margin: EdgeInsets.all(15.0),
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.all(25.0),
+                        color: Colors.white,
+                        onPressed: () {
+                          setState(() async {
+                            await Contraction.insert();
                             updateUi();
                           });
                         },
-                        child: Container(
-                          margin: EdgeInsets.all(15.0),
-                          padding: EdgeInsets.all(25.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'AIEE',
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ),
+                        child: Text(
+                          'AIEE',
+                          style: TextStyle(fontSize: 20.0),
                         ),
                       ),
                     ),
